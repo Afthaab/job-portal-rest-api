@@ -23,7 +23,11 @@ func SetupApi(a *auth.Auth, svc service.UserService) *gin.Engine {
 	r.Use(m.Log(), gin.Recovery())
 
 	r.GET("/check", m.Authenticate(Check))
-	r.POST("/user/signup", h.SignUp)
+	user := r.Group("/user")
+	{
+		user.POST("/signup", h.SignUp)
+		user.POST("/signin", h.Signin)
+	}
 
 	return r
 

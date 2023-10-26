@@ -16,6 +16,14 @@ type handler struct {
 	service service.UserService
 }
 
+func (h *handler) Signin(c *gin.Context) {
+	ctx := c.Request.Context()
+	traceid, ok := ctx.Value(middleware.TraceIDKey).(string)
+	if !ok {
+
+	}
+}
+
 func (h *handler) SignUp(c *gin.Context) {
 	ctx := c.Request.Context()
 
