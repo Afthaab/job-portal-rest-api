@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 
 	"github.com/afthaab/job-portal/internal/models"
@@ -12,7 +13,12 @@ type Repo struct {
 }
 
 type UserRepo interface {
-	CreateUser(userData models.User) (models.User, error)
+	CreateUser(ctx context.Context, userData models.User) (models.User, error)
+	CheckEmail(ctx context.Context, email string) (models.User, error)
+
+	CreateCompany(ctx context.Context, companyData models.Company) (models.Company, error)
+	ViewCompanies(ctx context.Context) ([]models.Company, error)
+	ViewCompanyById(ctx context.Context, cid uint64) (models.Company, error)
 }
 
 func NewRepository(db *gorm.DB) (UserRepo, error) {

@@ -11,8 +11,8 @@ import (
 	"github.com/afthaab/job-portal/internal/auth"
 	"github.com/afthaab/job-portal/internal/database"
 	"github.com/afthaab/job-portal/internal/handler"
+	"github.com/afthaab/job-portal/internal/repository"
 	"github.com/afthaab/job-portal/internal/service"
-	"github.com/afthaab/job-portal/repository"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 )
@@ -83,7 +83,7 @@ func StartApp() error {
 		return err
 	}
 
-	svc, err := service.NewService(repo)
+	svc, err := service.NewService(repo, a)
 	if err != nil {
 		return err
 	}
