@@ -5,19 +5,27 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 )
 
 type key string
 
-var TraceID key
+const TraceIDKey key = "1"
 
-func Log() gin.HandlerFunc {
+func (m *Mid) Log() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		uuidStr := uuid.NewString
+		uuidStr := uuid.NewString()
 
 		ctx := c.Request.Context()
 
-		ctx = context.WithValue(ctx, TraceID, uuidStr)
+		ctx = context.WithValue(ctx, TraceIDKey, uuidStr)
 
+		c.Request = c.Request.WithContext(ctx)
+
+		log.Info().Str("Trace ID", uuidStr).Str("Method", c.Request.Method).Str("URL Path", c.Request.URL.Path).Msg("Request Started")
+
+		defer log.Info().Str("Trace ID", uuidStr).Str("Method", c.Request.Method).Str("URL Path", c.Request.URL.Path).Int("Status Code", c.Writer.Status()).Msg("Request processing completed")
+
+		c.Next()
 	}
 }

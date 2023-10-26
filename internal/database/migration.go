@@ -2,27 +2,24 @@ package database
 
 import (
 	"github.com/afthaab/job-portal/internal/models"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func ConnectToDatabase() (*gorm.DB, error) {
-	dsn := "host=localhost user=postgres password=12345 dbname=jportal port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
+func AutoMigrate(db *gorm.DB) error {
+	//if s.db.Migrator().HasTable(&User{}) {
+	//	returngorm
+	//}
 
-	err = db.Migrator().DropTable(&models.User{})
+	err := db.Migrator().DropTable(&models.User{})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// AutoMigrate function will ONLY create tables, missing columns and missing indexes, and WON'T change existing column's type or delete unused columns
 	err = db.Migrator().AutoMigrate(&models.User{})
 	if err != nil {
 		// If there is an error while migrating, log the error message and stop the program
-		return nil, err
+		return err
 	}
-	return db, nil
+	return nil
 }

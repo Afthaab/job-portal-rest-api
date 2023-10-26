@@ -5,16 +5,24 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/afthaab/job-portal/internal/auth"
 	"github.com/afthaab/job-portal/internal/database"
 	"github.com/afthaab/job-portal/internal/handler"
+	"github.com/afthaab/job-portal/internal/service"
+	"github.com/afthaab/job-portal/repository"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	err := StartApp()
+	if err != nil {
+		log.Panic().Err(err).Send()
+	}
+	log.Info().Msg("Hello this is our app")
 
 }
 
@@ -68,13 +76,55 @@ func StartApp() error {
 		return fmt.Errorf("database is not connected: %w", err)
 	}
 
+	// =========================================================================
+	// initialize the repository layer
+	repo, err := repository.NewRepository(db)
+	if err != nil {
+		return err
+	}
+
+	svc, err := service.NewService(repo)
+	if err != nil {
+		return err
+	}
+
 	// initializing the http server
 	api := http.Server{
 		Addr:         ":8080",
 		ReadTimeout:  8000 * time.Second,
 		WriteTimeout: 800 * time.Second,
 		IdleTimeout:  800 * time.Second,
-		Handler:      handler.SetupApi(a),
+		Handler:      handler.SetupApi(a, svc),
 	}
+
+	// channel to store any errors while setting up the service
+	serverErrors := make(chan error, 1)
+
+	go func() {
+		log.Info().Str("Port", api.Addr).Msg("main started : api is listening")
+		serverErrors <- api.ListenAndServe()
+	}()
+
+	//shutdown channel intercepts ctrl+c signals
+	shutdown := make(chan os.Signal, 1)
+
+	signal.Notify(shutdown, os.Interrupt)
+
+	select {
+	case err := <-serverErrors:
+		return fmt.Errorf("server error : %w", err)
+
+	case sig := <-shutdown:
+		log.Info().Msgf("main: Start shutdown %s", sig)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		err := api.Shutdown(ctx)
+		if err != nil {
+			err := api.Close()
+			return fmt.Errorf("could not stop server gracefully : %w", err)
+		}
+	}
+	return nil
 
 }
