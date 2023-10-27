@@ -19,6 +19,11 @@ type UserRepo interface {
 	CreateCompany(ctx context.Context, companyData models.Company) (models.Company, error)
 	ViewCompanies(ctx context.Context) ([]models.Company, error)
 	ViewCompanyById(ctx context.Context, cid uint64) (models.Company, error)
+
+	CreateJob(ctx context.Context, jobData models.Jobs) (models.Jobs, error)
+	FindJob(ctx context.Context, cid uint64) ([]models.Jobs, error)
+	FindAllJobs(ctx context.Context) ([]models.Jobs, error)
+	ViewJobDetailsBy(ctx context.Context, jid uint64) (models.Jobs, error)
 }
 
 func NewRepository(db *gorm.DB) (UserRepo, error) {

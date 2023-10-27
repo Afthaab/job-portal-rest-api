@@ -35,6 +35,14 @@ func SetupApi(a *auth.Auth, svc service.UserService) *gin.Engine {
 			company.POST("/add", m.Authenticate(h.AddCompany))
 			company.GET("/view/all", m.Authenticate(h.ViewAllCompanies))
 			company.GET("/view/:id", m.Authenticate(h.ViewCompany))
+			company.GET("/job/view/:id", m.Authenticate(h.ViewJob))
+		}
+
+		jobs := admin.Group("jobs")
+		{
+			jobs.POST("/add/:cid", m.Authenticate(h.AddJobs))
+			jobs.GET("/view/all", m.Authenticate(h.ViewAllJobs))
+			jobs.GET("/view/:id", m.Authenticate(h.ViewJobByID))
 		}
 	}
 

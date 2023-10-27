@@ -24,5 +24,10 @@ func ConnectToDatabase() (*gorm.DB, error) {
 		// If there is an error while migrating, log the error message and stop the program
 		return nil, err
 	}
+	err = db.Migrator().AutoMigrate(&models.Jobs{})
+	if err != nil {
+		// If there is an error while migrating, log the error message and stop the program
+		return nil, err
+	}
 	return db, nil
 }

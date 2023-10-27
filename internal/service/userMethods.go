@@ -17,7 +17,7 @@ func (s *Service) UserSignIn(ctx context.Context, userData models.NewUser) (stri
 	var userDetails models.User
 	userDetails, err := s.UserRepo.CheckEmail(ctx, userData.Email)
 	if err != nil {
-		return "", errors.New("email not found")
+		return "", err
 	}
 
 	// comaparing the password and hashed password

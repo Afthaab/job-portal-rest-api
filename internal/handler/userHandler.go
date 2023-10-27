@@ -49,7 +49,7 @@ func (h *handler) Signin(c *gin.Context) {
 	if err != nil {
 		log.Error().Err(err).Str("trace id", traceid)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
