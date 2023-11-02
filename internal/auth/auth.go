@@ -17,7 +17,12 @@ type Auth struct {
 	publickey  *rsa.PublicKey
 }
 
-func NewAuth(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) (*Auth, error) {
+type Authentication interface {
+	GenerateAuthToken(claims jwt.RegisteredClaims) (string, error)
+	ValidateToken(token string) (jwt.RegisteredClaims, error)
+}
+
+func NewAuth(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) (Authentication, error) {
 	if privateKey == nil && publicKey == nil {
 		return nil, errors.New("publickey and privatekey cannot be null")
 	}

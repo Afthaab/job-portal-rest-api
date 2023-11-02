@@ -7,10 +7,10 @@ import (
 )
 
 type Mid struct {
-	auth *auth.Auth
+	auth auth.Authentication
 }
 
-func NewMiddleware(a *auth.Auth) (Mid, error) {
+func NewMiddleware(a auth.Authentication) (Mid, error) {
 	if a == nil {
 		return Mid{}, fmt.Errorf("auth cant be null")
 	}

@@ -11,7 +11,7 @@ import (
 
 type Service struct {
 	UserRepo repository.UserRepo
-	auth     *auth.Auth
+	auth     auth.Authentication
 }
 
 type UserService interface {
@@ -28,7 +28,7 @@ type UserService interface {
 	ViewJobById(ctx context.Context, jid uint64) (models.Jobs, error)
 }
 
-func NewService(userRepo repository.UserRepo, a *auth.Auth) (UserService, error) {
+func NewService(userRepo repository.UserRepo, a auth.Authentication) (UserService, error) {
 	if userRepo == nil {
 		return nil, errors.New("interface cannot be null")
 	}

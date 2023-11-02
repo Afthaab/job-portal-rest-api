@@ -93,3 +93,30 @@ func TestService_ViewJobById(t *testing.T) {
 		})
 	}
 }
+
+func TestService_ViewAllJobs(t *testing.T) {
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name    string
+		s       *Service
+		args    args
+		want    []models.Jobs
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.s.ViewAllJobs(tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Service.ViewAllJobs() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Service.ViewAllJobs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

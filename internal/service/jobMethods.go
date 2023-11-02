@@ -2,11 +2,15 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/afthaab/job-portal/internal/models"
 )
 
 func (s *Service) ViewJobById(ctx context.Context, jid uint64) (models.Jobs, error) {
+	if jid < uint64(10) {
+		return models.Jobs{}, errors.New("number is less than 10")
+	}
 	jobData, err := s.UserRepo.ViewJobDetailsBy(ctx, jid)
 	if err != nil {
 		return models.Jobs{}, err

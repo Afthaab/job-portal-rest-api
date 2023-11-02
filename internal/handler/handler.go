@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupApi(a *auth.Auth, svc service.UserService) *gin.Engine {
+func SetupApi(a auth.Authentication, svc service.UserService) *gin.Engine {
 	r := gin.New()
 
 	m, err := middleware.NewMiddleware(a)
