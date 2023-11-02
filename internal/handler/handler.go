@@ -1,57 +1,35 @@
 package handler
 
 import (
-	"log"
+	"errors"
 
-	"github.com/afthaab/job-portal/internal/auth"
-	"github.com/afthaab/job-portal/internal/middleware"
 	"github.com/afthaab/job-portal/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-func SetupApi(a auth.Authentication, svc service.UserService) *gin.Engine {
-	r := gin.New()
-
-	m, err := middleware.NewMiddleware(a)
-	if err != nil {
-		log.Panic("middlewares not setup")
-	}
-	h := handler{
-		service: svc,
-	}
-
-	r.Use(m.Log(), gin.Recovery())
-
-	r.GET("/check", m.Authenticate(Check))
-	user := r.Group("/user")
-	{
-		user.POST("/signup", h.SignUp)
-		user.POST("/signin", h.Signin)
-	}
-	admin := r.Group("/admin")
-	{
-		company := admin.Group("company")
-		{
-			company.POST("/add", m.Authenticate(h.AddCompany))
-			company.GET("/view/all", m.Authenticate(h.ViewAllCompanies))
-			company.GET("/view/:id", m.Authenticate(h.ViewCompany))
-			company.GET("/job/view/:id", m.Authenticate(h.ViewJob))
-		}
-
-		jobs := admin.Group("jobs")
-		{
-			jobs.POST("/add/:cid", m.Authenticate(h.AddJobs))
-			jobs.GET("/view/all", m.Authenticate(h.ViewAllJobs))
-			jobs.GET("/view/:id", m.Authenticate(h.ViewJobByID))
-		}
-	}
-
-	return r
-
+type handler struct {
+	service service.UserService
 }
 
-func Check(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"Message": "ok",
-	})
+type Handerfuncs interface {
+	Signin(c *gin.Context)
+	SignUp(c *gin.Context)
+
+	ViewCompany(c *gin.Context)
+	ViewAllCompanies(c *gin.Context)
+	AddCompany(c *gin.Context)
+
+	ViewJobByID(c *gin.Context)
+	ViewAllJobs(c *gin.Context)
+	ViewJob(c *gin.Context)
+	AddJobs(c *gin.Context)
+}
+
+func NewHandler(svc service.UserService) (Handerfuncs, error) {
+	if svc == nil {
+		return nil, errors.New("service interface cannot be null")
+	}
+	return &handler{
+		service: svc,
+	}, nil
 }

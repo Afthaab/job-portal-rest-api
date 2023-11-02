@@ -1,6 +1,6 @@
 module github.com/afthaab/job-portal
 
-go 1.21.1
+go 1.23
 
 require (
 	github.com/gin-gonic/gin v1.9.1

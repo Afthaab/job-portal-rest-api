@@ -6,15 +6,10 @@ import (
 
 	"github.com/afthaab/job-portal/internal/middleware"
 	"github.com/afthaab/job-portal/internal/models"
-	"github.com/afthaab/job-portal/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 )
-
-type handler struct {
-	service service.UserService
-}
 
 func (h *handler) Signin(c *gin.Context) {
 	ctx := c.Request.Context()

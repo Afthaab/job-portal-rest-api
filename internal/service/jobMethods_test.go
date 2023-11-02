@@ -80,7 +80,6 @@ func TestService_ViewJobById(t *testing.T) {
 			if tt.mockRepoResponse != nil {
 				mockRepo.EXPECT().ViewJobDetailsBy(tt.args.ctx, tt.args.jid).Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			// mockAuth:=
 			s, _ := NewService(mockRepo, &auth.Auth{})
 			got, err := s.ViewJobById(tt.args.ctx, tt.args.jid)
 			if (err != nil) != tt.wantErr {
@@ -99,17 +98,61 @@ func TestService_ViewAllJobs(t *testing.T) {
 		ctx context.Context
 	}
 	tests := []struct {
-		name    string
-		s       *Service
-		args    args
-		want    []models.Jobs
-		wantErr bool
+		name             string
+		args             args
+		want             []models.Jobs
+		wantErr          bool
+		mockRepoResponse func() ([]models.Jobs, error)
 	}{
-		// TODO: Add test cases.
+		{
+			name: "database success",
+			args: args{
+				ctx: context.Background(),
+			},
+			want: []models.Jobs{
+				{
+					Cid:          01,
+					Name:         "junio web developer",
+					Salary:       "10000",
+					NoticePeriod: "30",
+				}, {
+					Cid:          01,
+					Name:         "senior web developer",
+					Salary:       "100000",
+					NoticePeriod: "50",
+				},
+			},
+			wantErr: false,
+			mockRepoResponse: func() ([]models.Jobs, error) {
+				return []models.Jobs{
+					{
+						Cid:          01,
+						Name:         "junio web developer",
+						Salary:       "10000",
+						NoticePeriod: "30",
+					}, {
+						Cid:          01,
+						Name:         "senior web developer",
+						Salary:       "100000",
+						NoticePeriod: "50",
+					},
+				}, nil
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.s.ViewAllJobs(tt.args.ctx)
+			mc := gomock.NewController(t)
+			mockRepo := repository.NewMockUserRepo(mc)
+			mockRepo.EXPECT().FindAllJobs(tt.args.ctx).Return(tt.mockRepoResponse()).AnyTimes()
+
+			svc, err := NewService(mockRepo, &auth.Auth{})
+			if err != nil {
+				t.Errorf("error is initializing the repo layer")
+				return
+			}
+
+			got, err := svc.ViewAllJobs(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.ViewAllJobs() error = %v, wantErr %v", err, tt.wantErr)
 				return
