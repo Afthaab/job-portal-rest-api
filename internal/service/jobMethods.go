@@ -9,7 +9,7 @@ import (
 func (s *Service) ViewJobById(ctx context.Context, jid uint64) (models.Jobs, error) {
 	jobData, err := s.UserRepo.ViewJobDetailsBy(ctx, jid)
 	if err != nil {
-		return models.Jobs{}, nil
+		return models.Jobs{}, err
 	}
 	return jobData, nil
 }

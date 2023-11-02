@@ -12,6 +12,8 @@ type Repo struct {
 	DB *gorm.DB
 }
 
+//go:generate mockgen -source=repository.go -destination=repository_mock.go -package=repository
+
 type UserRepo interface {
 	CreateUser(ctx context.Context, userData models.User) (models.User, error)
 	CheckEmail(ctx context.Context, email string) (models.User, error)
