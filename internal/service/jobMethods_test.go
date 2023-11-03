@@ -12,6 +12,89 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
+func TestService_AddJobDetails(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		jobData models.Jobs
+		Cid     uint64
+	}
+	tests := []struct {
+		name             string
+		args             args
+		want             models.Jobs
+		wantErr          bool
+		mockRepoResponse func() (models.Jobs, error)
+	}{
+		{
+			name: "database success",
+			args: args{
+				ctx: context.Background(),
+				jobData: models.Jobs{
+					Cid:          1,
+					Name:         "Junior web developer",
+					NoticePeriod: "30",
+					Salary:       "10000",
+				},
+				Cid: 1,
+			},
+			want: models.Jobs{
+				Cid:          1,
+				Name:         "Junior web developer",
+				NoticePeriod: "30",
+				Salary:       "10000",
+			},
+			wantErr: false,
+			mockRepoResponse: func() (models.Jobs, error) {
+				return models.Jobs{
+					Cid:          1,
+					Name:         "Junior web developer",
+					NoticePeriod: "30",
+					Salary:       "10000",
+				}, nil
+			},
+		},
+		{
+			name: "database error",
+			args: args{
+				ctx: context.Background(),
+				jobData: models.Jobs{
+					Cid:          1,
+					Name:         "Junior web developer",
+					NoticePeriod: "30",
+					Salary:       "10000",
+				},
+				Cid: 1,
+			},
+			want:    models.Jobs{},
+			wantErr: true,
+			mockRepoResponse: func() (models.Jobs, error) {
+				return models.Jobs{}, errors.New("could not create the jobs")
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mc := gomock.NewController(t)
+			mockRepo := repository.NewMockUserRepo(mc)
+			mockRepo.EXPECT().CreateJob(tt.args.ctx, tt.args.jobData).Return(tt.mockRepoResponse()).AnyTimes()
+
+			svc, err := NewService(mockRepo, &auth.Auth{})
+			if err != nil {
+				t.Errorf("error is initializing the repo layer")
+				return
+			}
+			got, err := svc.AddJobDetails(tt.args.ctx, tt.args.jobData, tt.args.Cid)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Service.AddJobDetails() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Service.AddJobDetails() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestService_ViewJobById(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -139,6 +222,17 @@ func TestService_ViewAllJobs(t *testing.T) {
 				}, nil
 			},
 		},
+		{
+			name: "database error",
+			args: args{
+				ctx: context.Background(),
+			},
+			want:    []models.Jobs{},
+			wantErr: true,
+			mockRepoResponse: func() ([]models.Jobs, error) {
+				return nil, errors.New("could not find the records in the database")
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -159,6 +253,92 @@ func TestService_ViewAllJobs(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Service.ViewAllJobs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestService_ViewJob(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		cid uint64
+	}
+	tests := []struct {
+		name             string
+		args             args
+		want             []models.Jobs
+		wantErr          bool
+		mockRepoResponse func() ([]models.Jobs, error)
+	}{
+		{
+			name: "error in database",
+			args: args{
+				ctx: context.Background(),
+				cid: 1,
+			},
+			want:    nil,
+			wantErr: true,
+			mockRepoResponse: func() ([]models.Jobs, error) {
+				return nil, errors.New("could not view the jobs")
+			},
+		},
+		{
+			name: "success from database",
+			args: args{
+				ctx: context.Background(),
+				cid: 1,
+			},
+			want: []models.Jobs{
+				{
+					Cid:          1,
+					Name:         "Junior web developer",
+					Salary:       "100000",
+					NoticePeriod: "30",
+				},
+				{
+					Cid:          1,
+					Name:         "Senior web developer",
+					Salary:       "200000",
+					NoticePeriod: "10",
+				},
+			},
+			wantErr: false,
+			mockRepoResponse: func() ([]models.Jobs, error) {
+				return []models.Jobs{
+					{
+						Cid:          1,
+						Name:         "Junior web developer",
+						Salary:       "100000",
+						NoticePeriod: "30",
+					},
+					{
+						Cid:          1,
+						Name:         "Senior web developer",
+						Salary:       "200000",
+						NoticePeriod: "10",
+					},
+				}, nil
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mc := gomock.NewController(t)
+			mockRepo := repository.NewMockUserRepo(mc)
+			mockRepo.EXPECT().FindJob(tt.args.ctx, tt.args.cid).Return(tt.mockRepoResponse()).AnyTimes()
+
+			svc, err := NewService(mockRepo, &auth.Auth{})
+			if err != nil {
+				t.Errorf("error is initializing the repo layer")
+				return
+			}
+			got, err := svc.ViewJob(tt.args.ctx, tt.args.cid)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Service.ViewJob() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Service.ViewJob() = %v, want %v", got, tt.want)
 			}
 		})
 	}

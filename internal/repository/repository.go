@@ -9,7 +9,7 @@ import (
 )
 
 type Repo struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
 //go:generate mockgen -source=repository.go -destination=repository_mock.go -package=repository
@@ -33,6 +33,6 @@ func NewRepository(db *gorm.DB) (UserRepo, error) {
 		return nil, errors.New("db cannot be null")
 	}
 	return &Repo{
-		DB: db,
+		db: db,
 	}, nil
 }

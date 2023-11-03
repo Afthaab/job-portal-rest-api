@@ -9,7 +9,7 @@ import (
 )
 
 func (r *Repo) CreateCompany(ctx context.Context, companyData models.Company) (models.Company, error) {
-	result := r.DB.Create(&companyData)
+	result := r.db.Create(&companyData)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return models.Company{}, errors.New("could not create the company")
@@ -19,7 +19,7 @@ func (r *Repo) CreateCompany(ctx context.Context, companyData models.Company) (m
 
 func (r *Repo) ViewCompanies(ctx context.Context) ([]models.Company, error) {
 	var userDetails []models.Company
-	result := r.DB.Find(&userDetails)
+	result := r.db.Find(&userDetails)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return nil, errors.New("could not find the companies")
@@ -29,7 +29,7 @@ func (r *Repo) ViewCompanies(ctx context.Context) ([]models.Company, error) {
 
 func (r *Repo) ViewCompanyById(ctx context.Context, cid uint64) (models.Company, error) {
 	var companyData models.Company
-	result := r.DB.Where("id = ?", cid).First(&companyData)
+	result := r.db.Where("id = ?", cid).First(&companyData)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return models.Company{}, errors.New("could not find the company")

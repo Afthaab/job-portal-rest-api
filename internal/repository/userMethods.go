@@ -9,7 +9,7 @@ import (
 )
 
 func (r *Repo) CreateUser(ctx context.Context, UserDetails models.User) (models.User, error) {
-	result := r.DB.Create(&UserDetails)
+	result := r.db.Create(&UserDetails)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return models.User{}, errors.New("could not create the user")
@@ -19,7 +19,7 @@ func (r *Repo) CreateUser(ctx context.Context, UserDetails models.User) (models.
 
 func (r *Repo) CheckEmail(ctx context.Context, email string) (models.User, error) {
 	var userDetails models.User
-	result := r.DB.Where("email = ?", email).First(&userDetails)
+	result := r.db.Where("email = ?", email).First(&userDetails)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return models.User{}, errors.New("email not found")

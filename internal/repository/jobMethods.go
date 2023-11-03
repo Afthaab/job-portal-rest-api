@@ -10,7 +10,7 @@ import (
 
 func (r *Repo) ViewJobDetailsBy(ctx context.Context, jid uint64) (models.Jobs, error) {
 	var jobData models.Jobs
-	result := r.DB.Where("id = ?", jid).Find(&jobData)
+	result := r.db.Where("id = ?", jid).Find(&jobData)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return models.Jobs{}, errors.New("could not create the jobs")
@@ -19,7 +19,7 @@ func (r *Repo) ViewJobDetailsBy(ctx context.Context, jid uint64) (models.Jobs, e
 }
 
 func (r *Repo) CreateJob(ctx context.Context, jobData models.Jobs) (models.Jobs, error) {
-	result := r.DB.Create(&jobData)
+	result := r.db.Create(&jobData)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return models.Jobs{}, errors.New("could not create the jobs")
@@ -29,7 +29,7 @@ func (r *Repo) CreateJob(ctx context.Context, jobData models.Jobs) (models.Jobs,
 
 func (r *Repo) FindAllJobs(ctx context.Context) ([]models.Jobs, error) {
 	var jobDatas []models.Jobs
-	result := r.DB.Find(&jobDatas)
+	result := r.db.Find(&jobDatas)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return nil, errors.New("could not find the jobs")
@@ -40,7 +40,7 @@ func (r *Repo) FindAllJobs(ctx context.Context) ([]models.Jobs, error) {
 
 func (r *Repo) FindJob(ctx context.Context, cid uint64) ([]models.Jobs, error) {
 	var jobData []models.Jobs
-	result := r.DB.Where("cid = ?", cid).Find(&jobData)
+	result := r.db.Where("cid = ?", cid).Find(&jobData)
 	if result.Error != nil {
 		log.Info().Err(result.Error).Send()
 		return nil, errors.New("could not find the company")
