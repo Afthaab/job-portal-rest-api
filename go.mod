@@ -1,9 +1,10 @@
 module github.com/afthaab/job-portal
 
-go 1.21.1
+go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/go-playground/validator/v10 v10.15.5
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.3.1

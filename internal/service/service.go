@@ -14,6 +14,8 @@ type Service struct {
 	auth     auth.Authentication
 }
 
+//go:generate mockgen -source=service.go -destination=mockmodels/service_mock.go -package=mockmodels
+
 type UserService interface {
 	UserSignup(ctx context.Context, userData models.NewUser) (models.User, error)
 	UserSignIn(ctx context.Context, userData models.NewUser) (string, error)

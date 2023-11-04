@@ -14,7 +14,6 @@ import (
 
 func (s *Service) UserSignIn(ctx context.Context, userData models.NewUser) (string, error) {
 	// checcking the email in the db
-	var userDetails models.User
 	userDetails, err := s.UserRepo.CheckEmail(ctx, userData.Email)
 	if err != nil {
 		return "", err
@@ -35,7 +34,6 @@ func (s *Service) UserSignIn(ctx context.Context, userData models.NewUser) (stri
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}
-
 	token, err := s.auth.GenerateAuthToken(claims)
 	if err != nil {
 		return "", err
@@ -55,6 +53,7 @@ func (s *Service) UserSignup(ctx context.Context, userData models.NewUser) (mode
 		Email:        userData.Email,
 		PasswordHash: hashedPass,
 	}
+
 	userDetails, err = s.UserRepo.CreateUser(ctx, userDetails)
 	if err != nil {
 		return models.User{}, err

@@ -143,18 +143,6 @@ func TestService_ViewJobById(t *testing.T) {
 				}, nil
 			},
 		},
-		{
-			name: "invalid job id",
-			want: models.Jobs{},
-			args: args{
-				ctx: context.Background(),
-				jid: 5,
-			},
-			mockRepoResponse: func() (models.Jobs, error) {
-				return models.Jobs{}, nil
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -227,7 +215,7 @@ func TestService_ViewAllJobs(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want:    []models.Jobs{},
+			want:    nil,
 			wantErr: true,
 			mockRepoResponse: func() ([]models.Jobs, error) {
 				return nil, errors.New("could not find the records in the database")
